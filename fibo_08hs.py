@@ -57,6 +57,8 @@ import random
 tokenSlack = SLACK_BOT_TOKEN
 clientSlack = WebClient(token=tokenSlack)
 
+dir = os.path.dirname(__file__)
+
 logger = logging.getLogger(__name__)
 
 client = Client('fqnT2APdGB0hDJyJFaznx8hQHNFeRTfqwnIt4TfYxzBtsq4q9CqIB8tVySoDvlH8', 'VCIlmPwKTL0lzoSjxszbpB2MjMwYVWYQmf2QcL9JmZmo4GO8l5N3fB0gzQuUVKrl', {"verify": False, "timeout": 70})
@@ -734,7 +736,7 @@ def crearImagen(senales):
     #probable = price1
     #probable2 = price2
 
-    img_url = os.path.join(dir, 'background08hs.jpg')
+    img_url = os.path.join(dir,'img','background08hs.jpg')
     img = Image.open(img_url).convert('RGB')
     draw = ImageDraw.Draw(img)
 
@@ -944,20 +946,20 @@ crearImagen(senalesdata)
 #'Dif_High' : str.format('{0:.0f}',difmax),
 
 #res_comp_2 = edf.loc[edf.COMP_2, True]
-print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
+#print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
 #'R1_COMP' : str(fibocom[3]),
-print('Cantidad de CMO', cmo_count, len(res_c_2))
+#print('Cantidad de CMO', cmo_count, len(res_c_2))
 
-if (len(res_c_2) > 1):
-    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
+#if (len(res_c_2) > 1):
+#    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
 
 #dR0 = round((len(acr0)/len(edf)*100),2)
 #amas5 = round((len(arrexp)/len(edf)*100),2)
 #print('A+5%',amas5)
 #print('R0',dR0)
 #print('R1',dR1)
-print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
-csv_url = os.path.join(dir, '__FIBO08HS_'+fechaFN(f[0])+'.csv')
+#print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
+csv_url = os.path.join(dir,'csv','__FIBO08HS_'+fechaFN(f[0])+'.csv')
 edf.to_csv(csv_url, index=False)
 fs_filepath = csv_url
 fs_filepath_name = ('__FIBO08HS_' + fechaFN(f[0]) + '.csv')
