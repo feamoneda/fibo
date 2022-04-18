@@ -63,7 +63,6 @@ logger = logging.getLogger(__name__)
 
 client = Client('fqnT2APdGB0hDJyJFaznx8hQHNFeRTfqwnIt4TfYxzBtsq4q9CqIB8tVySoDvlH8', 'VCIlmPwKTL0lzoSjxszbpB2MjMwYVWYQmf2QcL9JmZmo4GO8l5N3fB0gzQuUVKrl', {"verify": False, "timeout": 70})
 data = client.get_all_tickers()
-data = ['SLPUSDT']
 
 # Authenticate to Twitter
 auth = tweepy.OAuthHandler("gZjXy1g6HZdxOWPZ6CsXI7Vdr", "ll5sP6Co7U2pcMySk2ScTCtmmh5KomPWRHifZfeEQ834HeG3IN")
@@ -1036,7 +1035,7 @@ try:
     result = clientSlack.files_upload(
         channels=channel_id,
         initial_comment="Here's my file :smile:",
-        file=file_name,
+        file=fs_filepath,
     )
     # Log the result
     logger.info(result)
