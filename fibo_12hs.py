@@ -798,138 +798,137 @@ c_2 = []
 rMoneda = []
 cmo_count = 0
 for stock in df['symbol']:
-    if (stock is not 'BNBUST'):
-        a += 1
-        tweet = []
-        intervalo = Client.KLINE_INTERVAL_1DAY
-        #COEF-DELTA>MIE-VIE
-        f = fechaUTC_format(fecha_hoy)
-        #f = fechaUTC_format("29 December, 2021 18:00:00")
-        hist = get_prices(stock, intervalo, f[0], f[1])
-        #hist = get_prices(stock, intervalo, "13 January, 2022 00:00:00", "26 January, 2022 00:00:00")
-        # print('for',type(hist))
-        if (hist is not None):
-                if( len(hist) > 3):
-                    delta = getDelta(hist)
-                    promVolumen = getVolumen(hist)
-                    fiboind = get_fibo(hist)
-                    dif = ( ( fiboind['R1'] / fiboind['S0'] ) * 100 ) - 100
-                    start_rev = fechaUTC_rev(f[0])
-                    print('---------------------------')
-                    hist_rev = get_prices(stock, intervalo, start_rev[0], start_rev[1])
-                    print(stock)
-                    #print('Hora REV', start_rev, f[1])
-                    r = reversal(hist_rev)
-                    #and stoch[0] > 50 and stoch[1] > 50  dif > 15): # and c[0] > 0 and iRSI > 40 and iRSI < 65 and roc > 9 and mom > -1 ): #and iCCI[0] < 100):  # and r[0] <= 50 and r[1] <= 70):  #and iCCI[0] > 150 // if( delta < 15): if( iMACD > 0 and c[0] > 0) >> %50
-                    if (start_rev is not None and delta is not None and r is not None and promVolumen is not None) :
+    a += 1
+    tweet = []
+    intervalo = Client.KLINE_INTERVAL_1DAY
+    #COEF-DELTA>MIE-VIE
+    f = fechaUTC_format(fecha_hoy)
+    #f = fechaUTC_format("29 December, 2021 18:00:00")
+    hist = get_prices(stock, intervalo, f[0], f[1])
+    #hist = get_prices(stock, intervalo, "13 January, 2022 00:00:00", "26 January, 2022 00:00:00")
+    # print('for',type(hist))
+    if (hist is not None):
+            if( len(hist) > 3):
+                delta = getDelta(hist)
+                promVolumen = getVolumen(hist)
+                fiboind = get_fibo(hist)
+                dif = ( ( fiboind['R1'] / fiboind['S0'] ) * 100 ) - 100
+                start_rev = fechaUTC_rev(f[0])
+                print('---------------------------')
+                hist_rev = get_prices(stock, intervalo, start_rev[0], start_rev[1])
+                print(stock)
+                #print('Hora REV', start_rev, f[1])
+                r = reversal(hist_rev)
+                #and stoch[0] > 50 and stoch[1] > 50  dif > 15): # and c[0] > 0 and iRSI > 40 and iRSI < 65 and roc > 9 and mom > -1 ): #and iCCI[0] < 100):  # and r[0] <= 50 and r[1] <= 70):  #and iCCI[0] > 150 // if( delta < 15): if( iMACD > 0 and c[0] > 0) >> %50
+                if (start_rev is not None and delta is not None and r is not None and promVolumen is not None) :
 
-                        if( delta > 5 and delta < 25 and dif > 3 and r['ENG_Bool'] == True and promVolumen > 50000):
-                            start1 = fechaUTC_fibo(f[0])
-                            #print(start1)
-                            #print(f[1])
-                            intervalo1 = Client.KLINE_INTERVAL_1DAY
-                            hist1 = get_prices(stock, intervalo1, start1, f[1])
-                            iEMA = EMA(hist1)
-                            iRSI = getRSI(hist1)
-                            iMA = ta.MA(hist1.Close, timeperiod=14, matype=0)
-                            iMA = round(iMA.iloc[-1],4)
-                            if( iRSI is not None and iEMA is not None and iMA is not None ): #and r is not None):
-                                #COMP SAB-MAR
-                                v += 1
-                                #hist2 = get_prices(stock, intervalo, fecha_comp[0], fecha_comp[1])
-                                #di = ( fiboind['R1'] / fiboind['Actual'] * 100 ) - 100
-                                difr0 = ( fiboind['R0'] / fiboind['Actual'] * 100 ) - 100
-                                mom = MOM(hist1.Close)
-                                roc = ROC(hist1.Close)
-                                cmo = CMO(hist1)
-                                stoch = iSTOCH(hist1)
-                                ##EVALUAR 2HR PREVIAS >>> RSI 50~+60 / STOCH RSI 1-30~60 2-30~40 rsi1==rsi2 REVERSAL / CCI
-                                iCCI = CCI(hist) ##PROBAR CON REGISTROS DE 20 DIAS
-                                coef = get_coef(hist)
-                                c = coef[1][0]
-                                #print('t',f[0])
-                                date_comp = fecha_comp(str(f[0])
-                                ##BUSCAR ENTRE COEF 4-12 Y MEJOR DELTA A LOS DOS DIAS
-                                #print(start1,f[1])
-                                hist3 = get_prices(stock, intervalo, date_comp[0], date_comp[1])
-                                fibocom = fibocomp(hist3, fiboind['S0'], fiboind['S1'], fiboind['S2'],fiboind['S3'],fiboind['R0'],fiboind['R1'], fiboind['R2'],fiboind['R3'],fiboind['P'],fiboind['Actual'],fiboind['Fecha'])
-                                #difmax = ( (Decimal(fibocom[25]) / Decimal(fiboind['Actual'])) * 100 ) - 100
-                                print( str(stock),'\t',str.format('{0:.1f}',dif), str(iMA), str(coef[1][0]), str.format('{0:.2f}', delta), str.format('{0:.8f}',fiboind['Actual']), str.format('{0:.8f}',fiboind['S1']),str.format('{0:.8f}',fiboind['R0']),str.format('{0:.8f}',fiboind['R1']),str.format('{0:.8f}',fiboind['R2']),'Up',str(r['Aroon_Up']),'Down',str(r['Aroon_Down']))
-                                if (cmo > 0):
-                                    cmo_count += 1
-                                    signal = ':ticket: ' + stock + '\t' + ' Buy: ' + str.format('{0:.8f}',fiboind['S0']) +' Target1: ' + str.format('{0:.8f}',fiboind['R0']) + ' Target2: '+  str.format('{0:.8f}',fiboind['R1']) + ' Estim. %'+ str.format('{0:.0f}',dif)
-                                    signals.append(signal)
-                                    tweet.append('#' + str(stock) + ' #Criptoseñal '+ f_hoy1)
-                                    tweet.append('Utiliza estas señales bajo tu propia responsabilidad.')
-                                    tweet.append('Mejor rendimiento de 2pm hacia las 8pm.')
-                                    tweet.append('🟩 Buy: ~' + str.format('{0:.8f}',fiboind['S0']) )
-                                    tweet.append('🟩 Target1: ~' + str.format('{0:.8f}',fiboind['R0']))
-                                    tweet.append('🎉 Target2: ~'+  str.format('{0:.8f}',fiboind['R1']))
-                                    tweet.append('Estim. ~%'+ str.format('{0:.0f}',dif))
-                                    tweet.append('#criptomonedas #binancearg #binance')
-                                    # Create a tweet
-                                    print('--------------------------------')
-                                    str_tweet = "\n". join(tweet)
-                                    print(str_tweet)
-                                    #api.update_status(str_tweet)
-                                    senalesdata.append( [ str(stock), str.format('{0:.0f}',dif), str.format('{0:.8f}',fiboind['R0']), str.format('{0:.8f}',fiboind['R1']) ] )
-                                    
-                                    e.append(
-                                                {
-                                                'Ticker' : str(stock),
-                                                'COMP_2': str(fibocom['COMP_2']),
-                                                'Coef' : str(coef[1][0][0][0]),
-                                                'RSI' : str(iRSI),
-                                                'Vol' : str(promVolumen),
-                                                'Delta' : str.format('{0:.2f}',(delta)),
-                                                'EMA' : str(iEMA),
-                                                'MA' : str(iMA),
-                                                'CCI-15' : str(iCCI[3]),
-                                                'CCI-16' : str(iCCI[1]),
-                                                'CCI-17' : str(iCCI[0]),
-                                                'AROON_UP' : str(r['Aroon_Up']),
-                                                'AROON_DOWN' : str(r['Aroon_Down']),
-                                                'ROC12' : str(roc[0]),
-                                                'ROC3' : str(roc[1]),
-                                                'ROC1' : str(roc[2]),
-                                                'MOM' : str(mom),
-                                                'CMO' : str(cmo),
-                                                'ENG_13': str(r['ENG_17']),
-                                                'ENG_14': str(r['ENG_18']),
-                                                'ENG_15': str(r['ENG_19']),
-                                                'ENG_16': str(r['ENG_20']),
-                                                'ENG_17': str(r['ENG_21']),
-                                                'MBOZU_13': str(r['MBOZU_17']),
-                                                'MBOZU_14': str(r['MBOZU_18']),
-                                                'MBOZU_15': str(r['MBOZU_19']),
-                                                'MBOZU_16': str(r['MBOZU_20']),
-                                                'MBOZU_17': str(r['MBOZU_21']),
-                                                'STOCHASTIC_A_19' : str(stoch[0][0][0]),
-                                                'STOCHASTIC_D_19' : str(stoch[0][0][1]),
-                                                'STOCHASTIC_B_19' : str(stoch[1][0]),
-                                                'STOCHASTIC_A_20' : str(stoch[0][1][0]),
-                                                'STOCHASTIC_D_20' : str(stoch[0][1][1]),
-                                                'STOCHASTIC_B_20' : str(stoch[1][1]),
-                                                'STOCHASTIC_A_21' : str(stoch[0][2][0]),
-                                                'STOCHASTIC_D_21' : str(stoch[0][2][1]),
-                                                'STOCHASTIC_B_21' : str(stoch[1][2]),
-                                                'Actual' : str.format('{0:.8f}',fiboind['Actual']),
-                                                '5%' : fibocom['R2_30_COMP'],
-                                                'DifS0R1' : str.format('{0:.0f}',dif),
-                                                'High%' : str.format('{0:.0f}',fibocom['COMP_DFM']),
-                                                'R1_COMP' : str(fibocom['R1_COMP']),
-                                                'R0_COMP' : str(fibocom['R0_COMP']),
-                                                'P' : str.format('{0:.8f}',fiboind['P']),
-                                                'S0' : str.format('{0:.8f}',fiboind['S0']),
-                                                'S1' : str.format('{0:.8f}',fiboind['S1']),
-                                                'S2' : str.format('{0:.8f}',fiboind['S2']),
-                                                'S3' : str.format('{0:.8f}',fiboind['S3']),
-                                                'R0' : str.format('{0:.8f}',fiboind['R0']),
-                                                'R1' : str.format('{0:.8f}',fiboind['R1']),
-                                                'R2' : str.format('{0:.8f}',fiboind['R2']),
-                                                'R3' : str.format('{0:.8f}',fiboind['R3']),
-                                                }
-                                            )
+                    if( delta > 5 and delta < 25 and dif > 3 and r['ENG_Bool'] == True and promVolumen > 50000):
+                        start1 = fechaUTC_fibo(f[0])
+                        #print(start1)
+                        #print(f[1])
+                        intervalo1 = Client.KLINE_INTERVAL_1DAY
+                        hist1 = get_prices(stock, intervalo1, start1, f[1])
+                        iEMA = EMA(hist1)
+                        iRSI = getRSI(hist1)
+                        iMA = ta.MA(hist1.Close, timeperiod=14, matype=0)
+                        iMA = round(iMA.iloc[-1],4)
+                        if( iRSI is not None and iEMA is not None and iMA is not None ): #and r is not None):
+                            #COMP SAB-MAR
+                            v += 1
+                            #hist2 = get_prices(stock, intervalo, fecha_comp[0], fecha_comp[1])
+                            #di = ( fiboind['R1'] / fiboind['Actual'] * 100 ) - 100
+                            difr0 = ( fiboind['R0'] / fiboind['Actual'] * 100 ) - 100
+                            mom = MOM(hist1.Close)
+                            roc = ROC(hist1.Close)
+                            cmo = CMO(hist1)
+                            stoch = iSTOCH(hist1)
+                            ##EVALUAR 2HR PREVIAS >>> RSI 50~+60 / STOCH RSI 1-30~60 2-30~40 rsi1==rsi2 REVERSAL / CCI
+                            iCCI = CCI(hist) ##PROBAR CON REGISTROS DE 20 DIAS
+                            coef = get_coef(hist)
+                            c = coef[1][0]
+                            #print('t',f[0])
+                            date_comp = fecha_comp(str(f[0])
+                            ##BUSCAR ENTRE COEF 4-12 Y MEJOR DELTA A LOS DOS DIAS
+                            #print(start1,f[1])
+                            hist3 = get_prices(stock, intervalo, date_comp[0], date_comp[1])
+                            fibocom = fibocomp(hist3, fiboind['S0'], fiboind['S1'], fiboind['S2'],fiboind['S3'],fiboind['R0'],fiboind['R1'], fiboind['R2'],fiboind['R3'],fiboind['P'],fiboind['Actual'],fiboind['Fecha'])
+                            #difmax = ( (Decimal(fibocom[25]) / Decimal(fiboind['Actual'])) * 100 ) - 100
+                            print( str(stock),'\t',str.format('{0:.1f}',dif), str(iMA), str(coef[1][0]), str.format('{0:.2f}', delta), str.format('{0:.8f}',fiboind['Actual']), str.format('{0:.8f}',fiboind['S1']),str.format('{0:.8f}',fiboind['R0']),str.format('{0:.8f}',fiboind['R1']),str.format('{0:.8f}',fiboind['R2']),'Up',str(r['Aroon_Up']),'Down',str(r['Aroon_Down']))
+                            if (cmo > 0):
+                                cmo_count += 1
+                                signal = ':ticket: ' + stock + '\t' + ' Buy: ' + str.format('{0:.8f}',fiboind['S0']) +' Target1: ' + str.format('{0:.8f}',fiboind['R0']) + ' Target2: '+  str.format('{0:.8f}',fiboind['R1']) + ' Estim. %'+ str.format('{0:.0f}',dif)
+                                signals.append(signal)
+                                tweet.append('#' + str(stock) + ' #Criptoseñal '+ f_hoy1)
+                                tweet.append('Utiliza estas señales bajo tu propia responsabilidad.')
+                                tweet.append('Mejor rendimiento de 2pm hacia las 8pm.')
+                                tweet.append('🟩 Buy: ~' + str.format('{0:.8f}',fiboind['S0']) )
+                                tweet.append('🟩 Target1: ~' + str.format('{0:.8f}',fiboind['R0']))
+                                tweet.append('🎉 Target2: ~'+  str.format('{0:.8f}',fiboind['R1']))
+                                tweet.append('Estim. ~%'+ str.format('{0:.0f}',dif))
+                                tweet.append('#criptomonedas #binancearg #binance')
+                                # Create a tweet
+                                print('--------------------------------')
+                                str_tweet = "\n". join(tweet)
+                                print(str_tweet)
+                                #api.update_status(str_tweet)
+                                senalesdata.append( [ str(stock), str.format('{0:.0f}',dif), str.format('{0:.8f}',fiboind['R0']), str.format('{0:.8f}',fiboind['R1']) ] )
+
+                                e.append(
+                                            {
+                                            'Ticker' : str(stock),
+                                            'COMP_2': str(fibocom['COMP_2']),
+                                            'Coef' : str(coef[1][0][0][0]),
+                                            'RSI' : str(iRSI),
+                                            'Vol' : str(promVolumen),
+                                            'Delta' : str.format('{0:.2f}',(delta)),
+                                            'EMA' : str(iEMA),
+                                            'MA' : str(iMA),
+                                            'CCI-15' : str(iCCI[3]),
+                                            'CCI-16' : str(iCCI[1]),
+                                            'CCI-17' : str(iCCI[0]),
+                                            'AROON_UP' : str(r['Aroon_Up']),
+                                            'AROON_DOWN' : str(r['Aroon_Down']),
+                                            'ROC12' : str(roc[0]),
+                                            'ROC3' : str(roc[1]),
+                                            'ROC1' : str(roc[2]),
+                                            'MOM' : str(mom),
+                                            'CMO' : str(cmo),
+                                            'ENG_13': str(r['ENG_17']),
+                                            'ENG_14': str(r['ENG_18']),
+                                            'ENG_15': str(r['ENG_19']),
+                                            'ENG_16': str(r['ENG_20']),
+                                            'ENG_17': str(r['ENG_21']),
+                                            'MBOZU_13': str(r['MBOZU_17']),
+                                            'MBOZU_14': str(r['MBOZU_18']),
+                                            'MBOZU_15': str(r['MBOZU_19']),
+                                            'MBOZU_16': str(r['MBOZU_20']),
+                                            'MBOZU_17': str(r['MBOZU_21']),
+                                            'STOCHASTIC_A_19' : str(stoch[0][0][0]),
+                                            'STOCHASTIC_D_19' : str(stoch[0][0][1]),
+                                            'STOCHASTIC_B_19' : str(stoch[1][0]),
+                                            'STOCHASTIC_A_20' : str(stoch[0][1][0]),
+                                            'STOCHASTIC_D_20' : str(stoch[0][1][1]),
+                                            'STOCHASTIC_B_20' : str(stoch[1][1]),
+                                            'STOCHASTIC_A_21' : str(stoch[0][2][0]),
+                                            'STOCHASTIC_D_21' : str(stoch[0][2][1]),
+                                            'STOCHASTIC_B_21' : str(stoch[1][2]),
+                                            'Actual' : str.format('{0:.8f}',fiboind['Actual']),
+                                            '5%' : fibocom['R2_30_COMP'],
+                                            'DifS0R1' : str.format('{0:.0f}',dif),
+                                            'High%' : str.format('{0:.0f}',fibocom['COMP_DFM']),
+                                            'R1_COMP' : str(fibocom['R1_COMP']),
+                                            'R0_COMP' : str(fibocom['R0_COMP']),
+                                            'P' : str.format('{0:.8f}',fiboind['P']),
+                                            'S0' : str.format('{0:.8f}',fiboind['S0']),
+                                            'S1' : str.format('{0:.8f}',fiboind['S1']),
+                                            'S2' : str.format('{0:.8f}',fiboind['S2']),
+                                            'S3' : str.format('{0:.8f}',fiboind['S3']),
+                                            'R0' : str.format('{0:.8f}',fiboind['R0']),
+                                            'R1' : str.format('{0:.8f}',fiboind['R1']),
+                                            'R2' : str.format('{0:.8f}',fiboind['R2']),
+                                            'R3' : str.format('{0:.8f}',fiboind['R3']),
+                                            }
+                                        )
 
 randomcrypto = randMoneda(senalesdata)
 res_c_2 = pd.DataFrame(c_2)
