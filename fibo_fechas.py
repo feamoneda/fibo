@@ -15,8 +15,8 @@ def f_format(fecha):
 def f_indicators(fecha):
     t = datetime.strptime(fecha, '%Y-%m-%d %H:%M:%S')
     UTC = t - timedelta(days=14)
-    UTC1_3 = UTC - timedelta(hours=3)
-    UTC2_3 = t - timedelta(hours=3)
+    UTC1_3 = UTC + timedelta(hours=3)
+    UTC2_3 = t + timedelta(hours=3)
     print('RSI/',str(UTC1_3), str(UTC2_3))
     return str(UTC)
 
