@@ -53,6 +53,9 @@ from slack_sdk.errors import SlackApiError
 import requests
 from requests.structures import CaseInsensitiveDict
 import random
+import fibo_fechas
+
+dir = os.path.dirname(__file__)
 
 tokenSlack = SLACK_BOT_TOKEN
 clientSlack = WebClient(token=tokenSlack)
@@ -63,7 +66,7 @@ client = Client('fqnT2APdGB0hDJyJFaznx8hQHNFeRTfqwnIt4TfYxzBtsq4q9CqIB8tVySoDvlH
 data = client.get_all_tickers()
 
 #data = ['LRCBTC','OGNUSDT','MITHUSDT','REQBTC','SLPUSDT','BRDBTC'] #data = ['ALGOUSDT','SLPUSDT','BTCUSDT']
-data = ['ALGOUSDT','SLPUSDT']
+#data = ['ALGOUSDT','SLPUSDT']
 
 # Authenticate to Twitter
 auth = tweepy.OAuthHandler("gZjXy1g6HZdxOWPZ6CsXI7Vdr", "ll5sP6Co7U2pcMySk2ScTCtmmh5KomPWRHifZfeEQ834HeG3IN")
@@ -223,7 +226,7 @@ def difOkrs(precio, rs, v1, v2):
             #print(x,change,str('No'))
             return str('No')
     if rs == 'r':
-        if (v1 <= precio and v2 >= precio):
+        if (v1 <= precio and v2 <= precio):
             return str('Ok')
         else:
             #print(x,change,str('No'))
@@ -299,7 +302,7 @@ def fibocomp(dataframe,s0,s1,s2,s3,r0,r1,r2,r3,p,a,f):
                #f2 = nactual.Date.iloc[0]
                hactual = dataframe.High.max()
                f3 = dataframe.loc[(dataframe.High == hactual)].Date.iloc[0]
-               #print('' ,str(fechaFormat_fiboind(f3)) , 'Precio Mas Alto:', hactual, '<', str(float(round(a,8))), (dataframe.Close[0] < float(round(a,8))))
+               print('' ,str(fechaFormat_fiboind(f3)) , 'Precio Mas Alto:', hactual, '<', str(float(round(a,8))), (dataframe.Close[0] < float(round(a,8))))
                aalto = hactual
             else:
                aalto = 0
@@ -312,7 +315,6 @@ def fibocomp(dataframe,s0,s1,s2,s3,r0,r1,r2,r3,p,a,f):
 
         #if (aalto is not 0 ):
             #print( round(aalto,8), round(a,8), round(dfm,2) )
-
         cs0 = difOkrs(s0, 's', bajo, alto)
         cs1 = difOkrs(s1, 's', bajo, alto)
         cs2 = difOkrs(s2, 's', bajo, alto)
@@ -325,9 +327,9 @@ def fibocomp(dataframe,s0,s1,s2,s3,r0,r1,r2,r3,p,a,f):
         r230 = (r2*Decimal(1.03))
         cr230 = difOkrs(r230, 'r', bajo, alto)
         aexp = (a*Decimal(1.04))
-        aexp = (a*Decimal(1.04))
         caexp = ( dfm >= 5 ) #difOkrs(aexp, 'r', a, aalto)
-        print('Comprobacion Maxima', dfm , 'Mayor a 5', caexp)        #print(str(fechaFormat_fiboind(f)),' Actual:',str.format('{0:.8f}',a),' +5% ', str.format('{0:.8f}',aexp), str.format('{0:.8f}',aalto))
+        print('Comprobacion Maxima', dfm , 'Mayor a 5', caexp)
+        #print(str(fechaFormat_fiboind(f)),' Actual:',str.format('{0:.8f}',a),' +5% ', str.format('{0:.8f}',aexp), str.format('{0:.8f}',aalto))
 
         if(cp == 'Ok'):
             acp.append(cp)
@@ -451,10 +453,10 @@ a = 0
 def fechaUTC_format(fecha):
     #print(a)
     t = datetime.strptime(fecha, '%d %B, %Y %H:%M:%S')
-    UTC1 = t - timedelta(days=1, hours=3)
-    UTC2 = t - timedelta(hours=19)
-    UTC1_3 = UTC1 - timedelta(hours=3)
-    UTC2_3 = UTC2 - timedelta(hours=3)
+    UTC1 = t - timedelta(hours=5)
+    UTC2 = t + timedelta(hours=3)
+    UTC1_3 = UTC1 + timedelta(hours=3)
+    UTC2_3 = UTC2 + timedelta(hours=3)
     if (a == 1):
         print('orig',str(UTC1_3),str(UTC2_3))
     return str(UTC1),str(UTC2)
@@ -469,7 +471,7 @@ b = 0
 def fechaUTC_fibo(fecha):
     #print(b)
     t = datetime.strptime(fecha, '%Y-%m-%d %H:%M:%S')
-    UTC = t - timedelta(days=14, hours=3)
+    UTC = t - timedelta(days=7)
     UTC1_3 = UTC - timedelta(hours=3)
     UTC2_3 = t - timedelta(hours=3)
     if (b == 1):
@@ -791,7 +793,7 @@ for stock in df['symbol']:
     tweet = []
     intervalo = Client.KLINE_INTERVAL_1HOUR
     #COEF-DELTA>MIE-VIE
-    f = fechaUTC_format(fecha_hoy)
+    f = fibo_fechas.f_format(fecha_hoy)
     hist = get_prices(stock, intervalo, f[0], f[1])
     # print('for',type(hist))
     if (hist is not None):
@@ -800,7 +802,7 @@ for stock in df['symbol']:
                 promVolumen = getVolumen(hist)
                 fiboind = get_fibo(hist)
                 dif = ( ( fiboind['R1'] / fiboind['S0'] ) * 100 ) - 100
-                start_rev = fechaUTC_rev(f[0])
+                start_rev = fibo_fechas.f_revf_rev(f[0])
                 #print('Hora REV', start_rev, f[1])
                 print('---------------------------')
 
@@ -812,7 +814,7 @@ for stock in df['symbol']:
                 if (start_rev is not None and delta is not None and r is not None and promVolumen is not None) :
 
                     if( delta > 5 and delta < 25 and dif > 3 and r['ENG_Bool'] == True and promVolumen > 50000):
-                        start1 = fechaUTC_fibo(f[0])
+                        start1 = fibo_fechas.f_indicators(f[0])
                         #print(start1)
                         #print(f[1])
                         intervalo1 = Client.KLINE_INTERVAL_1DAY
@@ -862,12 +864,11 @@ for stock in df['symbol']:
                                 #api.update_status(str_tweet)
                                 senalesdata.append( [ str(stock), str.format('{0:.0f}',dif), str.format('{0:.8f}',fiboind['R0']), str.format('{0:.8f}',fiboind['R1']) ] )
                                 if (fibocom is not None):
-                                    if(fibocom['COMP_2'] == True):
-                                        c_2.append(fibocom['COMP_2'])
 
                                     e.append(
                                                 {
                                                 'Ticker' : str(stock),
+                                                'COMP_2': str(fibocom['COMP_2']),
                                                 'Coef' : str(coef[1][0][0][0]),
                                                 'RSI' : str(iRSI),
                                                 'Vol' : str(promVolumen),
@@ -879,7 +880,9 @@ for stock in df['symbol']:
                                                 'CCI-17' : str(iCCI[0]),
                                                 'AROON_UP' : str(r['Aroon_Up']),
                                                 'AROON_DOWN' : str(r['Aroon_Down']),
-                                                'ROC' : str(roc),
+                                                'ROC12' : str(roc[0]),
+                                                'ROC3' : str(roc[1]),
+                                                'ROC1' : str(roc[2]),
                                                 'MOM' : str(mom),
                                                 'CMO' : str(cmo),
                                                 'ENG_13': str(r['ENG_17']),
@@ -902,11 +905,11 @@ for stock in df['symbol']:
                                                 'STOCHASTIC_D_21' : str(stoch[0][2][1]),
                                                 'STOCHASTIC_B_21' : str(stoch[1][2]),
                                                 'Actual' : str.format('{0:.8f}',fiboind['Actual']),
-                                                '5%' : fibocom[24],
+                                                '5%' : fibocom['R2_30_COMP'],
                                                 'DifS0R1' : str.format('{0:.0f}',dif),
-                                                'High%' : str.format('{0:.0f}',fibocom[26]),
-                                                'R0_COMP' : str(fibocom[21]),
-                                                'R1_COMP' : str(fibocom[3]),
+                                                'High%' : str.format('{0:.0f}',fibocom['COMP_DFM']),
+                                                'R1_COMP' : str(fibocom['R1_COMP']),
+                                                'R0_COMP' : str(fibocom['R0_COMP']),
                                                 'P' : str.format('{0:.8f}',fiboind['P']),
                                                 'S0' : str.format('{0:.8f}',fiboind['S0']),
                                                 'S1' : str.format('{0:.8f}',fiboind['S1']),
@@ -932,19 +935,19 @@ signals.append(':white_check_mark: LINK_COINBASE')
 #'Dif_High' : str.format('{0:.0f}',difmax),
 
 #res_comp_2 = edf.loc[edf.COMP_2, True]
-print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
+#print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
 #'R1_COMP' : str(fibocom[3]),
-print('Cantidad de CMO', cmo_count, len(res_c_2))
+#print('Cantidad de CMO', cmo_count, len(res_c_2))
 
-if (len(res_c_2) > 1):
-    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
+#if (len(res_c_2) > 1):
+#    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
 #dR0 = round((len(acr0)/len(edf)*100),2)
 #amas5 = round((len(arrexp)/len(edf)*100),2)
 #print('A+5%',amas5)
 #print('R0',dR0)
 #print('R1',dR1)
-print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
-csv_url = os.path.join(dir, '__FIBO17HS_'+fechaFN(f[0])+'.csv')
+#print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
+csv_url = os.path.join(dir,'csv', '__FIBO17HS_'+fechaFN(f[0])+'.csv')
 edf.to_csv(csv_url, index=False)
 fs_filepath = csv_url
 fs_filepath_name = ('__FIBO17HS_' + fechaFN(f[0]) + '.csv')
@@ -970,7 +973,7 @@ response = webhook.send(
         }
     ]
 )
-print(type(randomcrypto))
+#print(type(randomcrypto))
 if(randomcrypto is not None):
     str_randomsignals = "\n".join(randomcrypto)
     print(type(str_randomsignals))
@@ -991,13 +994,13 @@ if(randomcrypto is not None):
 # ID of channel that you want to upload file to
 #channel_id = "C02MLBQSCLF"
 
-cl = Cl()
-cl.login('feamoneda', 'SWMW@@6@2021!!')
-def crearPhoto(media_path):
-    for file_path in media_path:
-        cl.photo_upload_to_story(file_path)
+#cl = Cl()
+#cl.login('feamoneda', 'SWMW@@6@2021!!')
+#def crearPhoto(media_path):
+#    for file_path in media_path:
+#        cl.photo_upload_to_story(file_path)
 
-crearPhoto(mediasrotas)
+#crearPhoto(mediasrotas)
 
 my_file = { 'file' : (csv_url, 'csv') }
 url = "https://slack.com/api/files.upload"
@@ -1022,7 +1025,7 @@ try:
     result = clientSlack.files_upload(
         channels=channel_id,
         initial_comment="Here's my file :smile:",
-        file=file_name,
+        file=fs_filepath,
     )
     # Log the result
     logger.info(result)
@@ -1034,5 +1037,3 @@ except SlackApiError as e:
 
 # ID of channel that you want to upload file to
 channel_id = "C02MLBQSCLF"
-
-
