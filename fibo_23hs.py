@@ -950,7 +950,7 @@ crearImagen(senalesdata)
 #print('R0',dR0)
 #print('R1',dR1)
 dir_csv = os.path.join(dir, 'csv')
-csv_url = os.path.join(dir_csv, 'csv', '__FIBO23HS_'+fechaFN(f[0])+'.csv')
+csv_url = os.path.join(dir_csv, '__FIBO23HS_'+fechaFN(f[0])+'.csv')
 edf.to_csv(csv_url, index=False)
 fs_filepath = csv_url
 fs_filepath_name = ('__FIBO23HS_' + fechaFN(f[0]) + '.csv')
