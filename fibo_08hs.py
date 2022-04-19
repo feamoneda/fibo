@@ -53,6 +53,8 @@ from slack_sdk.errors import SlackApiError
 import requests
 from requests.structures import CaseInsensitiveDict
 import random
+import fibo_fechas
+
 
 tokenSlack = SLACK_BOT_TOKEN
 clientSlack = WebClient(token=tokenSlack)
@@ -802,8 +804,8 @@ for stock in df['symbol']:
     tweet = []
     intervalo = Client.KLINE_INTERVAL_1HOUR
     #COEF-DELTA>MIE-VIE
-    f = fechaUTC_format(fecha_hoy)
-    #f = fechaUTC_format("29 December, 2021 18:00:00")
+    f = fibo_fechas.f_format(fecha_hoy)
+    #f = fibo_fechas.f_format("29 December, 2021 18:00:00")
     hist = get_prices(stock, intervalo, f[0], f[1])
     # print('for',type(hist))
     if (hist is not None):
@@ -812,7 +814,7 @@ for stock in df['symbol']:
                 promVolumen = getVolumen(hist)
                 fiboind = get_fibo(hist)
                 dif = ( ( fiboind['R1'] / fiboind['S0'] ) * 100 ) - 100
-                start_rev = fechaUTC_rev(f[0])
+                start_rev = fibo_fechas.f_rev(f[0])
                 print('---------------------------')
                 hist_rev = get_prices(stock, intervalo, start_rev[0], start_rev[1])
                 print(stock)
@@ -822,7 +824,7 @@ for stock in df['symbol']:
                 if (start_rev is not None and delta is not None and r is not None and promVolumen is not None) :
 
                     if( delta > 5 and delta < 25 and dif > 3 and r['ENG_Bool'] == True and promVolumen > 50000):
-                        start1 = fechaUTC_fibo(f[0])
+                        start1 = fibo_fechas.f_indicators(f[0])
                         #print(start1)
                         #print(f[1])
                         intervalo1 = Client.KLINE_INTERVAL_1DAY
@@ -932,14 +934,14 @@ for stock in df['symbol']:
                                                 }
                                             )
 
-randomcrypto = randMoneda(senalesdata)
-res_c_2 = pd.DataFrame(c_2)
+#randomcrypto = randMoneda(senalesdata)
+#res_c_2 = pd.DataFrame(c_2)
 edf = pd.DataFrame(e)
 print(edf)
 signals.append('-----------------------------------------')
 signals.append(':ok_hand: Compartir es apreciar. Propinas... :weary::wink: ')
 signals.append(':white_check_mark: LINK_COINBASE')
-crearImagen(senalesdata)
+#crearImagen(senalesdata)
 
 #'5%' : fibocom[24],
 #'Dif_High' : str.format('{0:.0f}',difmax),
@@ -984,7 +986,7 @@ response = webhook.send(
         }
     ]
 )
-print(type(randomcrypto))
+#print(type(randomcrypto))
 if(randomcrypto is not None):
     str_randomsignals = "\n".join(randomcrypto)
     print(type(str_randomsignals))
@@ -1005,13 +1007,13 @@ if(randomcrypto is not None):
 # ID of channel that you want to upload file to
 #channel_id = "C02MLBQSCLF"
 
-cl = Cl()
-cl.login('feamoneda', 'SWMW@@6@2021!!')
-def crearPhoto(media_path):
-    for file_path in media_path:
-        cl.photo_upload_to_story(file_path)
+#cl = Cl()
+#cl.login('feamoneda', 'SWMW@@6@2021!!')
+#def crearPhoto(media_path):
+#    for file_path in media_path:
+#        cl.photo_upload_to_story(file_path)
 
-crearPhoto(mediasrotas)
+#crearPhoto(mediasrotas)
 my_file = { 'file' : (csv_url, 'csv') }
 url = "https://slack.com/api/files.upload"
 

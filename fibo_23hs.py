@@ -53,6 +53,7 @@ from slack_sdk.errors import SlackApiError
 import requests
 from requests.structures import CaseInsensitiveDict
 import random
+import fibo_fechas
 
 dir = os.path.dirname(__file__)
 
@@ -795,7 +796,7 @@ for stock in df['symbol']:
     tweet = []
     intervalo = Client.KLINE_INTERVAL_1HOUR
     #COEF-DELTA>MIE-VIE
-    f = fechaUTC_format(fecha_hoy)
+    f = fibo_fechas.f_format(fecha_hoy)
     hist = get_prices(stock, intervalo, f[0], f[1])
     # print('for',type(hist))
     if (hist is not None):
@@ -804,7 +805,7 @@ for stock in df['symbol']:
                 promVolumen = getVolumen(hist)
                 fiboind = get_fibo(hist)
                 dif = ( ( fiboind['R1'] / fiboind['S0'] ) * 100 ) - 100
-                start_rev = fechaUTC_rev(f[0])
+                start_rev = fibo_fechas.f_rev(f[0])
                 print('---------------------------')
                 hist_rev = get_prices(stock, intervalo, start_rev[0], start_rev[1])
                 print(stock)
@@ -813,7 +814,7 @@ for stock in df['symbol']:
                 if (start_rev is not None and delta is not None and r is not None and promVolumen is not None) :
 
                     if( delta > 5 and delta < 25 and dif > 3 and r['ENG_Bool'] == True and promVolumen > 50000):
-                        start1 = fechaUTC_fibo(f[0])
+                        start1 = fibo_fechas.f_indicators(f[0])
                         #print(start1)
                         #print(f[1])
                         intervalo1 = Client.KLINE_INTERVAL_1DAY
@@ -935,13 +936,13 @@ crearImagen(senalesdata)
 #'5%' : fibocom[24],
 #'Dif_High' : str.format('{0:.0f}',difmax),
 #res_comp_2 = edf.loc[edf.COMP_2, True]
-print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
+#print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
 #'R1_COMP' : str(fibocom[3]),
-print('Cantidad de CMO', cmo_count, len(res_c_2))
+#print('Cantidad de CMO', cmo_count, len(res_c_2))
 
-if (len(res_c_2) > 1):
-    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
-    print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
+#if (len(res_c_2) > 1):
+#    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
+#    print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
 
 #dR0 = round((len(acr0)/len(edf)*100),2)
 #amas5 = round((len(arrexp)/len(edf)*100),2)
@@ -949,7 +950,7 @@ if (len(res_c_2) > 1):
 #print('R0',dR0)
 #print('R1',dR1)
 dir_csv = os.path.join(dir, 'csv')
-csv_url = os.path.join(dir_csv, '__FIBO23HS_'+fechaFN(f[0])+'.csv')
+csv_url = os.path.join(dir_csv, 'csv', '__FIBO23HS_'+fechaFN(f[0])+'.csv')
 edf.to_csv(csv_url, index=False)
 fs_filepath = csv_url
 fs_filepath_name = ('__FIBO23HS_' + fechaFN(f[0]) + '.csv')

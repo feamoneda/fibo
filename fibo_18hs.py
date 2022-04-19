@@ -53,6 +53,8 @@ from slack_sdk.errors import SlackApiError
 import requests
 from requests.structures import CaseInsensitiveDict
 import random
+import fibo_fechas
+
 
 tokenSlack = SLACK_BOT_TOKEN
 clientSlack = WebClient(token=tokenSlack)
@@ -61,6 +63,8 @@ logger = logging.getLogger(__name__)
 
 client = Client('fqnT2APdGB0hDJyJFaznx8hQHNFeRTfqwnIt4TfYxzBtsq4q9CqIB8tVySoDvlH8', 'VCIlmPwKTL0lzoSjxszbpB2MjMwYVWYQmf2QcL9JmZmo4GO8l5N3fB0gzQuUVKrl', {"verify": False, "timeout": 70})
 data = client.get_all_tickers()
+
+#data = ['SLPUSDT','ALGOUSDT','BLZUSDT','BRDBTC','ETHUSDT']
 
 # Authenticate to Twitter
 auth = tweepy.OAuthHandler("gZjXy1g6HZdxOWPZ6CsXI7Vdr", "ll5sP6Co7U2pcMySk2ScTCtmmh5KomPWRHifZfeEQ834HeG3IN")
@@ -796,8 +800,8 @@ for stock in df['symbol']:
     tweet = []
     intervalo = Client.KLINE_INTERVAL_1HOUR
     #COEF-DELTA>MIE-VIE
-    f = fechaUTC_format(fecha_hoy)
-    #f = fechaUTC_format("29 December, 2021 18:00:00")
+    f = fibo_fechas.f_format(fecha_hoy)
+    #f = fibo_fechas.f_format("29 December, 2021 18:00:00")
     hist = get_prices(stock, intervalo, f[0], f[1])
     # print('for',type(hist))
     if (hist is not None):
@@ -806,7 +810,7 @@ for stock in df['symbol']:
                 promVolumen = getVolumen(hist)
                 fiboind = get_fibo(hist)
                 dif = ( ( fiboind['R1'] / fiboind['S0'] ) * 100 ) - 100
-                start_rev = fechaUTC_rev(f[0])
+                start_rev = fibo_fechas.f_rev(f[0])
                 print('---------------------------')
                 hist_rev = get_prices(stock, intervalo, start_rev[0], start_rev[1])
                 print(stock)
@@ -816,7 +820,7 @@ for stock in df['symbol']:
                 if (start_rev is not None and delta is not None and r is not None and promVolumen is not None) :
 
                     if( delta > 5 and delta < 25 and dif > 3 and r['ENG_Bool'] == True and promVolumen > 50000):
-                        start1 = fechaUTC_fibo(f[0])
+                        start1 = fibo_fechas.f_indicators(f[0])
                         #print(start1)
                         #print(f[1])
                         intervalo1 = Client.KLINE_INTERVAL_1DAY
@@ -926,8 +930,8 @@ for stock in df['symbol']:
                                                 }
                                             )
 
-randomcrypto = randMoneda(senalesdata)
-res_c_2 = pd.DataFrame(c_2)
+#randomcrypto = randMoneda(senalesdata)
+#res_c_2 = pd.DataFrame(c_2)
 edf = pd.DataFrame(e)
 print(edf)
 signals.append('-----------------------------------------')
@@ -939,20 +943,20 @@ signals.append(':white_check_mark: LINK_COINBASE')
 #'Dif_High' : str.format('{0:.0f}',difmax),
 
 #res_comp_2 = edf.loc[edf.COMP_2, True]
-print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
+#print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
 #'R1_COMP' : str(fibocom[3]),
-print('Cantidad de CMO', cmo_count, len(res_c_2))
+#print('Cantidad de CMO', cmo_count, len(res_c_2))
 
-if (len(res_c_2) > 1):
-    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
+#if (len(res_c_2) > 1):
+#    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
 
 #dR0 = round((len(acr0)/len(edf)*100),2)
 #amas5 = round((len(arrexp)/len(edf)*100),2)
 #print('A+5%',amas5)
 #print('R0',dR0)
 #print('R1',dR1)
-print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
-csv_url = os.path.join(dir, '__FIBO18HS_'+fechaFN(f[0])+'.csv')
+#print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
+csv_url = os.path.join(dir,'csv', '__FIBO18HS_'+fechaFN(f[0])+'.csv')
 edf.to_csv(csv_url, index=False)
 fs_filepath = csv_url
 fs_filepath_name = ('__FIBO18HS_' + fechaFN(f[0]) + '.csv')
@@ -978,7 +982,7 @@ response = webhook.send(
         }
     ]
 )
-print(type(randomcrypto))
+#print(type(randomcrypto))
 if(randomcrypto is not None):
     str_randomsignals = "\n".join(randomcrypto)
     print(type(str_randomsignals))
@@ -987,7 +991,7 @@ if(randomcrypto is not None):
         text="fallback",
         blocks=[
             {
-                "type": "section",
+               "type": "section",
                 "text": {
                     "type": "mrkdwn",
                     "text": str_randomsignals
@@ -999,13 +1003,13 @@ if(randomcrypto is not None):
 # ID of channel that you want to upload file to
 #channel_id = "C02MLBQSCLF"
 
-cl = Cl()
-cl.login('feamoneda', 'SWMW@@6@2021!!')
-def crearPhoto(media_path):
-    for file_path in media_path:
-        cl.photo_upload_to_story(file_path)
+#cl = Cl()
+#cl.login('feamoneda', 'SWMW@@6@2021!!')
+#def crearPhoto(media_path):
+#    for file_path in media_path:
+#        cl.photo_upload_to_story(file_path)
 
-crearPhoto(mediasrotas)
+#crearPhoto(mediasrotas)
 
 my_file = { 'file' : (csv_url, 'csv') }
 url = "https://slack.com/api/files.upload"

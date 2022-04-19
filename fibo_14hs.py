@@ -54,6 +54,8 @@ import requests
 from requests.structures import CaseInsensitiveDict
 import random
 
+dir = os.path.dirname(__file__)
+
 tokenSlack = SLACK_BOT_TOKEN
 clientSlack = WebClient(token=tokenSlack)
 
@@ -474,6 +476,8 @@ def fechaUTC_fibo(fecha):
     UTC = t - timedelta(days=14, hours=3)
     UTC1_3 = UTC - timedelta(hours=3)
     UTC2_3 = t - timedelta(hours=3)
+    print('FIBO/',str(UTC1_3), str(UTC2_3))
+
     if (b == 1):
         print('RSI/',str(UTC1_3), str(UTC2_3))
     return str(UTC)
@@ -482,7 +486,9 @@ def fechaUTC_rev(fecha):
     t = datetime.strptime(fecha, '%Y-%m-%d %H:%M:%S')
     UTC = t + timedelta(hours=2)
     UTC1 = UTC + timedelta(hours=6)
-    #UTC2_3 = t - timedelta(hours=3)
+    UTC1_3 = UTC + timedelta(hours=3)
+    UTC2_3 = UTC1 + timedelta(hours=3)
+    print('REV/',str(UTC1_3), str(UTC2_3))
     #if (b == 1):
     #    print('RSI/',str(UTC1_3), str(UTC2_3))
     return str(UTC), str(UTC1)
@@ -731,7 +737,7 @@ def crearImagen(senales):
     #porcentaje = '~%'+'10' #dif
     #probable = price1
     #probable2 = price2
-    img_url = os.path.join(dir, 'background14hs.jpg')
+    img_url = os.path.join(dir,'img', 'background14hs.jpg')
     img = Image.open(img_url).convert('RGB')
     draw = ImageDraw.Draw(img)
 
@@ -798,8 +804,8 @@ for stock in df['symbol']:
     tweet = []
     intervalo = Client.KLINE_INTERVAL_1HOUR
     #COEF-DELTA>MIE-VIE
-    f = fechaUTC_format(fecha_hoy)
-    #f = fechaUTC_format("29 December, 2021 18:00:00")
+    f = fibo_fechas.f_format(fecha_hoy)
+    #f = fibo_fechas.f_format("29 December, 2021 18:00:00")
     hist = get_prices(stock, intervalo, f[0], f[1])
     # print('for',type(hist))
     if (hist is not None):
@@ -808,7 +814,7 @@ for stock in df['symbol']:
                 promVolumen = getVolumen(hist)
                 fiboind = get_fibo(hist)
                 dif = ( ( fiboind['R1'] / fiboind['S0'] ) * 100 ) - 100
-                start_rev = fechaUTC_rev(f[0])
+                start_rev = fibo_fechas.f_rev(f[0])
                 print('---------------------------')
                 hist_rev = get_prices(stock, intervalo, start_rev[0], start_rev[1])
                 print(stock)
@@ -818,7 +824,7 @@ for stock in df['symbol']:
                 if (start_rev is not None and delta is not None and r is not None and promVolumen is not None) :
 
                     if( delta > 5 and delta < 25 and dif > 3 and r['ENG_Bool'] == True and promVolumen > 50000):
-                        start1 = fechaUTC_fibo(f[0])
+                        start1 = fibo_fechas.f_indicators(f[0])
                         #print(start1)
                         #print(f[1])
                         intervalo1 = Client.KLINE_INTERVAL_1DAY
@@ -867,95 +873,91 @@ for stock in df['symbol']:
                                 print(str_tweet)
                                 #api.update_status(str_tweet)
                                 senalesdata.append( [ str(stock), str.format('{0:.0f}',dif), str.format('{0:.8f}',fiboind['R0']), str.format('{0:.8f}',fiboind['R1']) ] )
-                                 
-                                if (fibocom is not None):
-                                    if(fibocom['COMP_2'] == True):
-                                        c_2.append(fibocom['COMP_2'])
-                                    
-                                    e.append(
-                                                {
-                                                'Ticker' : str(stock),
-                                                'COMP_2': str(fibocom['COMP_2']),
-                                                'Coef' : str(coef[1][0][0][0]),
-                                                'RSI' : str(iRSI),
-                                                'Vol' : str(promVolumen),
-                                                'Delta' : str.format('{0:.2f}',(delta)),
-                                                'EMA' : str(iEMA),
-                                                'MA' : str(iMA),
-                                                'CCI-15' : str(iCCI[3]),
-                                                'CCI-16' : str(iCCI[1]),
-                                                'CCI-17' : str(iCCI[0]),
-                                                'AROON_UP' : str(r['Aroon_Up']),
-                                                'AROON_DOWN' : str(r['Aroon_Down']),
-                                                'ROC12' : str(roc[0]),
-                                                'ROC3' : str(roc[1]),
-                                                'ROC1' : str(roc[2]),
-                                                'MOM' : str(mom),
-                                                'CMO' : str(cmo),
-                                                'ENG_13': str(r['ENG_17']),
-                                                'ENG_14': str(r['ENG_18']),
-                                                'ENG_15': str(r['ENG_19']),
-                                                'ENG_16': str(r['ENG_20']),
-                                                'ENG_17': str(r['ENG_21']),
-                                                'MBOZU_13': str(r['MBOZU_17']),
-                                                'MBOZU_14': str(r['MBOZU_18']),
-                                                'MBOZU_15': str(r['MBOZU_19']),
-                                                'MBOZU_16': str(r['MBOZU_20']),
-                                                'MBOZU_17': str(r['MBOZU_21']),
-                                                'STOCHASTIC_A_19' : str(stoch[0][0][0]),
-                                                'STOCHASTIC_D_19' : str(stoch[0][0][1]),
-                                                'STOCHASTIC_B_19' : str(stoch[1][0]),
-                                                'STOCHASTIC_A_20' : str(stoch[0][1][0]),
-                                                'STOCHASTIC_D_20' : str(stoch[0][1][1]),
-                                                'STOCHASTIC_B_20' : str(stoch[1][1]),
-                                                'STOCHASTIC_A_21' : str(stoch[0][2][0]),
-                                                'STOCHASTIC_D_21' : str(stoch[0][2][1]),
-                                                'STOCHASTIC_B_21' : str(stoch[1][2]),
-                                                'Actual' : str.format('{0:.8f}',fiboind['Actual']),
-                                                '5%' : fibocom['R2_30_COMP'],
-                                                'DifS0R1' : str.format('{0:.0f}',dif),
-                                                'High%' : str.format('{0:.0f}',fibocom['COMP_DFM']),
-                                                'R1_COMP' : str(fibocom['R1_COMP']),
-                                                'R0_COMP' : str(fibocom['R0_COMP']),
-                                                'P' : str.format('{0:.8f}',fiboind['P']),
-                                                'S0' : str.format('{0:.8f}',fiboind['S0']),
-                                                'S1' : str.format('{0:.8f}',fiboind['S1']),
-                                                'S2' : str.format('{0:.8f}',fiboind['S2']),
-                                                'S3' : str.format('{0:.8f}',fiboind['S3']),
-                                                'R0' : str.format('{0:.8f}',fiboind['R0']),
-                                                'R1' : str.format('{0:.8f}',fiboind['R1']),
-                                                'R2' : str.format('{0:.8f}',fiboind['R2']),
-                                                'R3' : str.format('{0:.8f}',fiboind['R3']),
-                                                }
-                                            )
 
-randomcrypto = randMoneda(senalesdata)
-res_c_2 = pd.DataFrame(c_2)
+                                e.append(
+                                            {
+                                            'Ticker' : str(stock),
+                                            'COMP_2': str(fibocom['COMP_2']),
+                                            'Coef' : str(coef[1][0][0][0]),
+                                            'RSI' : str(iRSI),
+                                            'Vol' : str(promVolumen),
+                                            'Delta' : str.format('{0:.2f}',(delta)),
+                                            'EMA' : str(iEMA),
+                                            'MA' : str(iMA),
+                                            'CCI-15' : str(iCCI[3]),
+                                            'CCI-16' : str(iCCI[1]),
+                                            'CCI-17' : str(iCCI[0]),
+                                            'AROON_UP' : str(r['Aroon_Up']),
+                                            'AROON_DOWN' : str(r['Aroon_Down']),
+                                            'ROC12' : str(roc[0]),
+                                            'ROC3' : str(roc[1]),
+                                            'ROC1' : str(roc[2]),
+                                            'MOM' : str(mom),
+                                            'CMO' : str(cmo),
+                                            'ENG_13': str(r['ENG_17']),
+                                            'ENG_14': str(r['ENG_18']),
+                                            'ENG_15': str(r['ENG_19']),
+                                            'ENG_16': str(r['ENG_20']),
+                                            'ENG_17': str(r['ENG_21']),
+                                            'MBOZU_13': str(r['MBOZU_17']),
+                                            'MBOZU_14': str(r['MBOZU_18']),
+                                            'MBOZU_15': str(r['MBOZU_19']),
+                                            'MBOZU_16': str(r['MBOZU_20']),
+                                            'MBOZU_17': str(r['MBOZU_21']),
+                                            'STOCHASTIC_A_19' : str(stoch[0][0][0]),
+                                            'STOCHASTIC_D_19' : str(stoch[0][0][1]),
+                                            'STOCHASTIC_B_19' : str(stoch[1][0]),
+                                            'STOCHASTIC_A_20' : str(stoch[0][1][0]),
+                                            'STOCHASTIC_D_20' : str(stoch[0][1][1]),
+                                            'STOCHASTIC_B_20' : str(stoch[1][1]),
+                                            'STOCHASTIC_A_21' : str(stoch[0][2][0]),
+                                            'STOCHASTIC_D_21' : str(stoch[0][2][1]),
+                                            'STOCHASTIC_B_21' : str(stoch[1][2]),
+                                            'Actual' : str.format('{0:.8f}',fiboind['Actual']),
+                                            '5%' : fibocom['R2_30_COMP'],
+                                            'DifS0R1' : str.format('{0:.0f}',dif),
+                                            'High%' : str.format('{0:.0f}',fibocom['COMP_DFM']),
+                                            'R1_COMP' : str(fibocom['R1_COMP']),
+                                            'R0_COMP' : str(fibocom['R0_COMP']),
+                                            'P' : str.format('{0:.8f}',fiboind['P']),
+                                            'S0' : str.format('{0:.8f}',fiboind['S0']),
+                                            'S1' : str.format('{0:.8f}',fiboind['S1']),
+                                            'S2' : str.format('{0:.8f}',fiboind['S2']),
+                                            'S3' : str.format('{0:.8f}',fiboind['S3']),
+                                            'R0' : str.format('{0:.8f}',fiboind['R0']),
+                                            'R1' : str.format('{0:.8f}',fiboind['R1']),
+                                            'R2' : str.format('{0:.8f}',fiboind['R2']),
+                                            'R3' : str.format('{0:.8f}',fiboind['R3']),
+                                            }
+                                        )
+
+#randomcrypto = randMoneda(senalesdata)
+#res_c_2 = pd.DataFrame(c_2)
 edf = pd.DataFrame(e)
 print(edf)
 signals.append('-----------------------------------------')
 signals.append(':ok_hand: Compartir es apreciar. Propinas... :weary::wink: ')
 signals.append(':white_check_mark: LINK_COINBASE')
-crearImagen(senalesdata)
+#crearImagen(senalesdata)
 
 #'5%' : fibocom[24],
 #'Dif_High' : str.format('{0:.0f}',difmax),
 
 #res_comp_2 = edf.loc[edf.COMP_2, True]
-print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
+#print('Cantidad de Valores positivos en COMP_2 ',len(res_c_2))
 #'R1_COMP' : str(fibocom[3]),
-print('Cantidad de CMO', cmo_count, len(res_c_2))
+#print('Cantidad de CMO', cmo_count, len(res_c_2))
 
-if (len(res_c_2) > 1):
-    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
+#if (len(res_c_2) > 1):
+#    porcentaje_comp_2 = round(((len(res_c_2)*100/cmo_count)),2)
 
 #dR0 = round((len(acr0)/len(edf)*100),2)
 #amas5 = round((len(arrexp)/len(edf)*100),2)
 #print('A+5%',amas5)
 #print('R0',dR0)
 #print('R1',dR1)
-print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
-csv_url = os.path.join(dir, '__FIBO14HS_'+fechaFN(f[0])+'.csv')
+#print('Probabilidad de rendimiento del 2'+'%'+' es del '+' %'+str(porcentaje_comp_2))
+csv_url = os.path.join(dir,'csv', '__FIBO14HS_'+fechaFN(f[0])+'.csv')
 edf.to_csv(csv_url, index=False)
 fs_filepath = csv_url
 fs_filepath_name = ('__FIBO14HS_' + fechaFN(f[0]) + '.csv')
@@ -981,7 +983,7 @@ response = webhook.send(
         }
     ]
 )
-print(type(randomcrypto))
+#print(type(randomcrypto))
 if(randomcrypto is not None):
     str_randomsignals = "\n".join(randomcrypto)
     print(type(str_randomsignals))
@@ -1002,13 +1004,13 @@ if(randomcrypto is not None):
 # ID of channel that you want to upload file to
 #channel_id = "C02MLBQSCLF"
 
-cl = Cl()
-cl.login('feamoneda', 'SWMW@@6@2021!!')
-def crearPhoto(media_path):
-    for file_path in media_path:
-        cl.photo_upload_to_story(file_path)
+#cl = Cl()
+#cl.login('feamoneda', 'SWMW@@6@2021!!')
+#def crearPhoto(media_path):
+#    for file_path in media_path:
+#        cl.photo_upload_to_story(file_path)
 
-crearPhoto(mediasrotas)
+#crearPhoto(mediasrotas)
 
 my_file = { 'file' : (csv_url, 'csv') }
 
@@ -1034,7 +1036,7 @@ try:
     result = clientSlack.files_upload(
         channels=channel_id,
         initial_comment="Here's my file :smile:",
-        file=file_name,
+        file=fs_filepath,
     )
     # Log the result
     logger.info(result)
