@@ -459,7 +459,7 @@ def fechaUTC_format(fecha):
     #print('orig',str(UTC1),str(UTC2))
     #print('orig_FORMAT',str(UTC1_3),str(UTC2_3))
     if (a == 1):
-        print('orig',str(UTC1_3),str(UTC2_3))
+        #print('orig',str(UTC1_3),str(UTC2_3))
     return str(UTC1),str(UTC2)
 
 def fechaFN(fecha):
@@ -476,7 +476,7 @@ def fechaUTC_fibo(fecha):
     UTC1_3 = UTC - timedelta(hours=3)
     UTC2_3 = t - timedelta(hours=3)
     if (b == 1):
-        print('RSI/',str(UTC1_3), str(UTC2_3))
+        #print('RSI/',str(UTC1_3), str(UTC2_3))
     return str(UTC)
 
 def fechaUTC_rev(fecha):
@@ -496,7 +496,7 @@ def fecha_comp(fecha):
     UTC1_3 = UTC1 - timedelta(hours=3)
     UTC2_3 = UTC2 - timedelta(hours=3)
     if (v == 1):
-        print('comp',str(UTC1_3),str(UTC2_3))
+        #print('comp',str(UTC1_3),str(UTC2_3))
     #print('Comp no format',str(UTC1),str(UTC2))
     #print('Comp formateada',str(UTC1_3),str(UTC2_3))
     return str(UTC1),str(UTC2)
@@ -510,7 +510,7 @@ def fechaUTC_comp(fecha):
     UTC1_3 = UTC1 - timedelta(hours=3)
     UTC2_3 = UTC2 - timedelta(hours=3)
     if (v == 1):
-        print('comp',str(UTC1_3),str(UTC2_3))
+        #print('comp',str(UTC1_3),str(UTC2_3))
 
     #print('comp',str(UTC1),str(UTC2))
     return str(UTC1),str(UTC2)
@@ -983,22 +983,22 @@ response = webhook.send(
     ]
 )
 #print(type(randomcrypto))
-if(randomcrypto is not None):
-    str_randomsignals = "\n".join(randomcrypto)
-    print(type(str_randomsignals))
-    webhook1 = WebhookClient(url)
-    response1 = webhook.send(
-        text="fallback",
-        blocks=[
-            {
-               "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": str_randomsignals
-                }
-            }
-        ]
-    )
+#if(randomcrypto is not None):
+#    str_randomsignals = "\n".join(randomcrypto)
+#    print(type(str_randomsignals))
+#    webhook1 = WebhookClient(url)
+#    response1 = webhook.send(
+#        text="fallback",
+#        blocks=[
+#            {
+#               "type": "section",
+#                "text": {
+#                    "type": "mrkdwn",
+#                    "text": str_randomsignals
+#                }
+#            }
+#        ]
+#    )
 
 # ID of channel that you want to upload file to
 #channel_id = "C02MLBQSCLF"
