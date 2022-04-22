@@ -983,22 +983,22 @@ response = webhook.send(
     ]
 )
 #print(type(randomcrypto))
-if(randomcrypto is not None):
-    str_randomsignals = "\n".join(randomcrypto)
-    print(type(str_randomsignals))
-    webhook1 = WebhookClient(url)
-    response1 = webhook.send(
-        text="fallback",
-        blocks=[
-            {
-               "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": str_randomsignals
-                }
-            }
-        ]
-    )
+#if(randomcrypto is not None):
+#    str_randomsignals = "\n".join(randomcrypto)
+#    print(type(str_randomsignals))
+#    webhook1 = WebhookClient(url)
+#    response1 = webhook.send(
+#        text="fallback",
+#        blocks=[
+#            {
+#               "type": "section",
+#                "text": {
+#                    "type": "mrkdwn",
+#                    "text": str_randomsignals
+#                }
+#            }
+#        ]
+#    )
 
 # ID of channel that you want to upload file to
 #channel_id = "C02MLBQSCLF"
